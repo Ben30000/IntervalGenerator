@@ -9,6 +9,12 @@ public class MeshItem {
 	private double targetZ;
 	private double minAngleForWall, maxAngleForWall;
 	
+	public MeshItem() {
+		// default values
+		this.minAngleForWall = -58.0;
+		this.maxAngleForWall = 58.0;
+	}
+	
 	public MeshItem(String filePath, double[] worldPosition, double scale, double[] rotationXYZ, String dataType, double targetZ, double minAngleForWall, double maxAngleForWall) {
 		
 		this.setFilePath(filePath);

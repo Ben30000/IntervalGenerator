@@ -60,48 +60,144 @@ int test = 0;
 		
 		// Standard
 		String inputGeometryFile = "C:/StageItems/IntervalGenerator_INPUT.txt";
-		String theZone = "C:/StageItems/TestCeilings4.txt";
 		
+		String outFileName = "C:/StageItems/WORLD_INTERVAL_DATA_";
 		
 		double precision = 0.0001;
 		
 	
-		String aTString = " value1 = 20.1        value2 = 10.5           value3=4.0";
-		String[] aTStringTokens = aTString.split("\\s+ |=");
-		ArrayList<String> allTokens = new ArrayList<String>();
-		
-		for (int c = 0; c < aTStringTokens.length; c++) {
-			System.out.println("~Token~");
-			System.out.println(aTStringTokens[c]);
-		}
 		
 		FileReader fileReaderStageItems = new FileReader(inputGeometryFile);
 		BufferedReader bufferedReaderStageItems = new BufferedReader(fileReaderStageItems);
-		String fileLine = null;
+		String stageItemsFileLine = null;
 		
-		System.out.println("Input geometry lines test");
-		boolean readingPositionData = false, readingScaleData = false, readingRotationXYZData = false;
+		boolean readingStageItem = false, readingPositionData = false, readingScaleData = false, readingRotationXYZData = false;
 		
+		ArrayList<MeshItem> meshItems = new ArrayList<MeshItem>();
+		int currentMeshItemIndex = -1;
 		
-		
-		
-		
+		while ((stageItemsFileLine = bufferedReaderStageItems.readLine()) != null) {
+			
+			
+			String[] stageItemsFileLineEqualSignSplit = stageItemsFileLine.split("=");
+			ArrayList<String> stageItemFilesLineSplit = new ArrayList<String>();
+			for (int u = 0; u < stageItemsFileLineEqualSignSplit.length; u++) {
+				String[] spaceSplit = stageItemsFileLineEqualSignSplit[u].split("\\s+");
+				for (int y = 0; y < spaceSplit.length; y++) {
+					if (spaceSplit[y].compareTo("") != 0) {
+						stageItemFilesLineSplit.add(spaceSplit[y]);
+					}
+				}
+			}
+			
+			if (stageItemFilesLineSplit.get(0).compareTo("OBJECT") == 0) {
+				currentMeshItemIndex++;
+				readingStageItem = true;
+				MeshItem newMeshItem = new MeshItem();
+				meshItems.add(newMeshItem);
+				continue;
+			}
+			
+			
+			else if (stageItemFilesLineSplit.get(0).compareTo("path") == 0) {
+				String aFilePath = stageItemFilesLineSplit.get(1);
+				meshItems.get(currentMeshItemIndex).setFilePath(aFilePath);
+			}			
+			
+			
+			else if (stageItemFilesLineSplit.get(0).compareTo("data") == 0) {
+				
+				String dataType = stageItemFilesLineSplit.get(1);
+
+				if (dataType.compareTo("2D") == 0  &&  stageItemFilesLineSplit.size() != 4) {
+					System.out.println("ERROR: 2D Data type was specified, but no targetZ was provided.");
+					System.exit(0);
+				}
+				if (stageItemFilesLineSplit.get(2).compareTo("targetZ") != 0) {
+					System.out.println("ERROR: 2D Data type was specified, but an argument other than targetZ was provided.");
+					System.exit(0);
+				}
+				meshItems.get(currentMeshItemIndex).setDataType(dataType);
+				meshItems.get(currentMeshItemIndex).setTargetZ(Double.parseDouble(stageItemFilesLineSplit.get(3)));
+				
+			}
+			
+			
+			else if (stageItemFilesLineSplit.get(0).compareTo("position") == 0) {
+				
+				if (stageItemFilesLineSplit.size() != 4) {
+					System.out.println("ERROR: position needs 3 comma-separated values");
+					System.exit(0);
+				}
+				
+				meshItems.get(currentMeshItemIndex).setWorldPosition( new double[] { Double.parseDouble(stageItemFilesLineSplit.get(1)),
+						Double.parseDouble(stageItemFilesLineSplit.get(2)), Double.parseDouble(stageItemFilesLineSplit.get(3)) });
+			}
+			
+			
+			else if (stageItemFilesLineSplit.get(0).compareTo("scale") == 0) {
+				meshItems.get(currentMeshItemIndex).setScale(Double.parseDouble(stageItemFilesLineSplit.get(1)));
+			}
+			
+			
+			else if (stageItemFilesLineSplit.get(0).compareTo("rotationXYZ") == 0) {
+				meshItems.get(currentMeshItemIndex).setRotationXYZ( new double[] { Double.parseDouble(stageItemFilesLineSplit.get(1)),
+						Double.parseDouble(stageItemFilesLineSplit.get(2)), Double.parseDouble(stageItemFilesLineSplit.get(3)) });				
+			}
+			
+			
+			else if (stageItemFilesLineSplit.get(0).compareTo("wallAngleRange") == 0) {
+				meshItems.get(currentMeshItemIndex).setMinAngleForWall(Double.parseDouble(stageItemFilesLineSplit.get(1)));
+				meshItems.get(currentMeshItemIndex).setMaxAngleForWall(Double.parseDouble(stageItemFilesLineSplit.get(2)));
+			}	
+			
+					
+			
+		}
+		System.out.println("******************************");
+		System.out.println("******************************");
+		for (int h = 0; h < meshItems.size(); h++) {
+			double[] pos = meshItems.get(h).getWorldPosition();
+			double scale = meshItems.get(h).getScale();
+			double[] rotateXYZ = meshItems.get(h).getRotationXYZ();
+			double minAngle = meshItems.get(h).getMinAngleForWall();
+			double maxAngle = meshItems.get(h).getMaxAngleForWall();
+			
+			System.out.println("  Mesh item "+h);
+			System.out.println("Position = "+new Vector3d(pos[0],pos[1],pos[2]));
+			System.out.println("Scale = "+scale);
+			System.out.println("RotationXYZ= "+new Vector3d(rotateXYZ[0],rotateXYZ[1],rotateXYZ[2]));
+			System.out.println("minAngle = "+minAngle);
+			System.out.println("maxAngle = "+maxAngle);
+		}
+		System.out.println("******************************");
+		System.out.println("******************************");		
 		//while((fileLine = bufferedReaderStageItems.readLine()) != null) {
 		
-			
+			System.out.println("meshItems.size() = "+meshItems.size());
 		//String[] fileLineTokens = fileLine.split(" = ");
+			
+			
+	for (int p = 0; p < meshItems.size(); p++) {
 		
-		tX = 10.0;
-		tY = -18.91;
-		tZ = -7.0;
-		size = 3.10;
-		rotationX = 0.0;
-		rotationY = -1.5707963;
-		rotationZ = 0.0;
-		double targetZValue = -5.0;
+		System.out.println("START OF FOR LOOP");
 		
-		double terrainMinAngle = -58.0;
-		double terrainMaxAngle = 58.0;
+		String theZone = meshItems.get(p).getFilePath();
+		
+		tX = meshItems.get(p).getWorldPosition()[0];
+		tY = meshItems.get(p).getWorldPosition()[1];
+		tZ = meshItems.get(p).getWorldPosition()[2];
+		
+		size = meshItems.get(p).getScale();;
+		rotationX = meshItems.get(p).getRotationXYZ()[0];
+		rotationY = meshItems.get(p).getRotationXYZ()[1];
+		rotationZ = meshItems.get(p).getRotationXYZ()[2];
+		
+		System.out.println("MESH ITEM "+p+" with FP: "+theZone);
+		double targetZValue = meshItems.get(p).getTargetZ();
+		
+		double terrainMinAngle = meshItems.get(p).getMinAngleForWall();
+		double terrainMaxAngle = meshItems.get(p).getMaxAngleForWall();
 		terrainMinAngle = Math.toRadians(terrainMinAngle);
 		terrainMaxAngle = Math.toRadians(terrainMaxAngle);
 		// Generate the transformation matrix (world space)
@@ -121,7 +217,7 @@ int test = 0;
 		
 	    
 	    
-	    String outFileName = "C:/StageItems/WORLD_INTERVAL_DATA_";
+	    
 		
         FileReader fileReader = 
                 new FileReader(theZone);
@@ -489,11 +585,11 @@ int test = 0;
             System.out.println("Num ceilings: " +ceilings.size());
             
             
+    System.out.println("END OF FOR LOOP");        
+	} 
             
             
-            
-            
-            
+    System.out.println("AFTER FOR LOOP");        
             
             
             
