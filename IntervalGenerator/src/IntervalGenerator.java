@@ -8,7 +8,9 @@ import org.joml.Matrix4d;
 import org.joml.Vector3f;
 import org.joml.Vector4d;
 import org.joml.Vector3d;
-import org.joml.Quaternionf; 
+import org.joml.Quaternionf;
+import org.joml.Vector2d;
+
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -21,8 +23,6 @@ public class IntervalGenerator {
 	// Input: a batch of vertices, normals, indicies, a translation, rotation, and scaling for this mesh,  as well as a line from a x1,z1 to x2,z2 to generate world data
 	// Output: a file containing intervals and/or ceilings/sloped walls	
 
-	private static boolean linesIntersect;
-	private static double intersectionPointX,intersectionPointY;
 	static double landingPrecision = 0.0000000000001;
 	private static double tX,tY,tZ, size, rotationX, rotationY, rotationZ;
 
@@ -444,64 +444,84 @@ int test = 0;
             	v3Z = tV3.z;
             	
             	
-            	//System.out.println("v3 " + v3X + " " + v3Y + " " + v3Z);
+            	ArrayList<Vector3d> intersectionPoints = new ArrayList<Vector3d>();
             	
+            	System.out.println("                        ~~New Polygon~~");
             	
-            	ArrayList<Double> intersectedX = new ArrayList<Double>();
-            	ArrayList<Double> intersectedY = new ArrayList<Double>();
-            	
-            	if (lineIntersection(v1X,v1Z,v2X,v2Z,-1000.0,targetZValue,1000.0,targetZValue) == 1) {
-            		//System.out.println("Potentially able to add a solution 1: " + intersectionPointX + ", " + intersectionPointY);
-            		
-            		if (!(isWithinArray(intersectionPointX,intersectedX) == 1) || !(isWithinArray(intersectionPointY,intersectedY) == 1)) {
-            			intersectedX.add(intersectionPointX);
-            			intersectedY.add(intersectionPointY);
-            			
-            		}
+            	System.out.println("Edge 1: "+(new Vector2d(v1X,v1Z))+",  "+(new Vector2d(v2X,v2Z)));
+            	double[] edge1IntersectionResult = lineIntersection(v1X,v1Z,v2X,v2Z,-1000000.0,targetZValue,1000000.0,targetZValue); 
+            	if (edge1IntersectionResult != null) {
+            		// Create the 3d point by interpolating the y value
+            		Vector3d intersectionPoint = new Vector3d( edge1IntersectionResult[0],
+            				interpolateLinear(new Vector3d(v1X,v1Z,v1Y), new Vector3d(v2X,v2Z,v2Y), new Vector2d(edge1IntersectionResult[0],edge1IntersectionResult[1])),
+            				edge1IntersectionResult[1] );
+            		System.out.println(" Edge 1: Potential Intersection: "+intersectionPoint);
+            		if (!isVector3dWithinArrayList(intersectionPoint,intersectionPoints)) {
+            			System.out.println("   GONNA ADD IT");
+            			intersectionPoints.add(intersectionPoint);
+            		} 
             		
             	}
             	
-            	if (lineIntersection(v1X,v1Z,v3X,v3Z,-1000.0,targetZValue,1000.0,targetZValue) == 1) {
-            		//System.out.println("Potentially able to add a solution 2: " + intersectionPointX + ", " + intersectionPointY);
+            	System.out.println("Edge 2: "+(new Vector2d(v1X,v1Z))+",  "+(new Vector2d(v3X,v3Z)));
+            	double[] edge2IntersectionResult = lineIntersection(v1X,v1Z,v3X,v3Z,-1000000.0,targetZValue,1000000.0,targetZValue);
+            	if (edge2IntersectionResult != null) {
             		
-            		if (!(isWithinArray(intersectionPointX,intersectedX) == 1) || !(isWithinArray(intersectionPointY,intersectedY) == 1)) {
-            			intersectedX.add(intersectionPointX);
-            			intersectedY.add(intersectionPointY);
-            			
-            		}
+            		Vector3d intersectionPoint = new Vector3d( edge2IntersectionResult[0],
+            				interpolateLinear(new Vector3d(v1X,v1Z,v1Y), new Vector3d(v3X,v3Z,v3Y), new Vector2d(edge2IntersectionResult[0],edge2IntersectionResult[1])),
+            				edge2IntersectionResult[1] );
+            		System.out.println(" Edge 2: Potential Intersection: "+intersectionPoint);
+            		if (!isVector3dWithinArrayList(intersectionPoint,intersectionPoints)) {
+            			System.out.println("   GONNA ADD IT");
+            			intersectionPoints.add(intersectionPoint);
+            		} 
             		
             	}
-            	if (lineIntersection(v2X,v2Z,v3X,v3Z,-1000.0,targetZValue,1000.0,targetZValue) == 1) {
-            	//	System.out.println("Potentially able to add a solution 3: " + intersectionPointX + ", " + intersectionPointY);
+            	
+            	System.out.println("Edge 3: "+(new Vector2d(v2X,v2Z))+",  "+(new Vector2d(v3X,v3Z)));
+            	double[] edge3IntersectionResult = lineIntersection(v2X,v2Z,v3X,v3Z,-1000000.0,targetZValue,1000000.0,targetZValue);
+            	if (edge3IntersectionResult != null) {
             		
-						if (!(isWithinArray(intersectionPointX,intersectedX) == 1) || !(isWithinArray(intersectionPointY,intersectedY) == 1)) {
-						intersectedX.add(intersectionPointX);
-						intersectedY.add(intersectionPointY);
-						
-						}
+            		Vector3d intersectionPoint = new Vector3d( edge3IntersectionResult[0],
+            				interpolateLinear(new Vector3d(v2X,v2Z,v2Y), new Vector3d(v3X,v3Z,v3Y), new Vector2d(edge3IntersectionResult[0],edge3IntersectionResult[1])),
+            				edge3IntersectionResult[1] );
+            		System.out.println(" Edge 3: Potential Intersection: "+intersectionPoint);
+        			if (!isVector3dWithinArrayList(intersectionPoint,intersectionPoints)) {
+        				System.out.println("   GONNA ADD IT");
+            			intersectionPoints.add(intersectionPoint);
+            		} 
 	
             	}
             	
-            	if (intersectedX.size() == 3) {
-            		
-            		System.out.println("Err");
+            	if (intersectionPoints.size() == 1) {
+            		System.out.println("Intersection Line Count: 1");
+            	}
+            	if (intersectionPoints.size() == 3) {
+            		System.out.println("Error");
             		System.exit(0);
             	}
             	//System.out.println("Size of intersectedX is " + intersectedX.size());
-            	if (intersectedX.size() == 2) {
+            	if (intersectionPoints.size() == 2) {
             		intervalCount++;
-            		//System.out.println("Generating an Interval");
-            //		System.out.println("X1 and X2 of this interval are " + Math.min(intersectedX.get(0), intersectedX.get(1)) + ", " + Math.max(intersectedX.get(0), intersectedX.get(1)));
-          //  	System.out.println("Z1 and Z2 are " + Math.min(intersectedY.get(0), intersectedY.get(1)) + ", " + Math.max(intersectedY.get(0), intersectedY.get(1)));
-            x1 = Math.min(intersectedX.get(0), intersectedX.get(1));
-            x2 = Math.max(intersectedX.get(0), intersectedX.get(1));
-            
-            y1 = interpolateHeight(new Vector3d(v1X,v1Y,v1Z),new Vector3d(v2X,v2Y,v2Z),new Vector3d(v3X,v3Y,v3Z),x1,targetZValue);
-            y2 = interpolateHeight(new Vector3d(v1X,v1Y,v1Z),new Vector3d(v2X,v2Y,v2Z),new Vector3d(v3X,v3Y,v3Z),x2,targetZValue);
-         
-            z1 = targetZValue;
-            z2 = targetZValue;
-            
+            		System.out.println("!!!!!!!!!!!!!!!!!! Generating an Interval !!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+            		if ( intersectionPoints.get(1).x >= intersectionPoints.get(0).x ) {
+            			x1 = intersectionPoints.get(0).x;
+            			y1 = intersectionPoints.get(0).y;
+            			z1 = intersectionPoints.get(0).z;
+            			x2 = intersectionPoints.get(1).x;
+            			y2 = intersectionPoints.get(1).y;
+            			z2 = intersectionPoints.get(1).z;
+            			
+            		} else {
+            			x1 = intersectionPoints.get(1).x;
+            			y1 = intersectionPoints.get(1).y;
+            			z1 = intersectionPoints.get(1).z;
+            			x2 = intersectionPoints.get(0).x;
+            			y2 = intersectionPoints.get(0).y;
+            			z2 = intersectionPoints.get(0).z;
+            		}
+	         
 
             	/*
             	 *********************************************************************
@@ -548,7 +568,35 @@ int test = 0;
             	Vector3d upVector = new Vector3d(0.0,1.0,0.0);
             	// Angle between up and planar normal
             	double planarNormalAngle = planarNormal.angle(upVector);
-
+            	
+            	
+            	// FOR HANDLING PERPENDICULAR WALLS
+            	if (x1 == x2 && planarNormal.x < 0.0) {
+            		if (y2 < y1) {
+            			double x2Temp, y2Temp;
+            			x2Temp = x2;
+            			y2Temp = y2;
+            			x2 = x1;
+            			y2 = y1;
+            			x1 = x2Temp;
+            			y1 = y2Temp;
+            		}
+            	}
+            	if (x1 == x2 && planarNormal.x > 0.0) {
+            		if (y2 > y1) {
+            			double x2Temp, y2Temp;
+            			x2Temp = x2;
+            			y2Temp = y2;
+            			x2 = x1;
+            			y2 = y1;
+            			x1 = x2Temp;
+            			y1 = y2Temp;
+            		}
+            	}
+            	
+            	
+            	
+            	
             	// Angle of trajectory entity takes on the polygon
             	double platformAngle = Math.atan2(y2 - y1, x2 - x1);
             	
@@ -657,14 +705,12 @@ int test = 0;
 		
 	}
 
-	static public int lineIntersection(double x1, double y1, double x2, double y2, double a1, double b1, double a2,
+	static public double[] lineIntersection(double x1, double y1, double x2, double y2, double a1, double b1, double a2,
 			double b2) {
 
 		double boundsP = 0.0000000000001;
-		//System.out.println("Line Intersection Function");
-		//System.out.println("Line 1: " + x1 + ", " + y1 + " and " + x2 + ", " + y2);
-		//System.out.println("Line 2: " + a1 + ", " + b1 + " and " + a2 + ", " + b2);
-
+		double intersectionPointX, intersectionPointY;
+		
 		double A1 = y2 - y1;
 		double B1 = x1 - x2;
 		double C1 = A1 * x1 + B1 * y1;
@@ -676,22 +722,13 @@ int test = 0;
 		double d = A1 * B2 - A2 * B1;
 
 		if (Math.abs(d) <= 0.000000000000000000000001) {
-
-			//System.out.println("Whyd that happen");
-			// System.exit(0);
-			linesIntersect = false;
-
-			return 0;
-
+			return null;
 		}
 
 		else {
 
 			double pointX = (B2 * C1 - B1 * C2) / d;
 			double pointY = (A1 * C2 - A2 * C1) / d;
-
-			//System.out.println("PointX is " + pointX);
-			//System.out.println("PointY is " + pointY);
 
 			if ((pointX > Math.min(x1, x2) || Math.abs(pointX - Math.min(x1, x2)) <= boundsP)
 					&& (pointX < Math.max(x1, x2) || Math.abs(pointX - Math.max(x1, x2)) <= boundsP)
@@ -703,42 +740,35 @@ int test = 0;
 					&& (pointY < Math.max(b1, b2) || Math.abs(pointY - Math.max(b1, b2)) <= boundsP)) {
 
 				//System.out.println("Intersection Point Found");
-				linesIntersect = true;
 				intersectionPointX = pointX;
 				intersectionPointY = pointY;
-				return 1;
+				return new double[] {intersectionPointX, intersectionPointY};
 			} else {
 
 			//	System.out.println("Lines Intersect but Solution is oob");
-				linesIntersect = false;
-
 				intersectionPointX = pointX;
 				intersectionPointY = pointY;
-			//	System.out.println("Line 1 is " + x1 + ", "+ y1 + " to " + x2 + ", "+ y2);
-			//	System.out.println("Line 2 is " + a1 + ", "+ b1 + " to " + a2 +  ", " + b2);
-			//	System.out.println("The lines intsct at " + intersectionPointX + ", " + intersectionPointY);
-				
-				return 0;
+				return null;
 			}
 		}
 
 	}
 	
 	
-	static public int isWithinArray(double searchTarget,ArrayList<Double> theList) {
-		
+	static public boolean isVector3dWithinArrayList(Vector3d searchTarget, ArrayList<Vector3d> theList) {
+		double searchTargetX = searchTarget.x, searchTargetY = searchTarget.y, searchTargetZ = searchTarget.z;
 		for (int b = 0; b < theList.size(); b++) {
 			
-			if (Math.abs(theList.get(b) - searchTarget) <= landingPrecision) {
-				return 1;
+			if (Math.abs(theList.get(b).x - searchTargetX) <= landingPrecision  &&  Math.abs(theList.get(b).y - searchTargetY) <= landingPrecision  &&  Math.abs(theList.get(b).z - searchTargetZ) <= landingPrecision) {
+				return true;
 			}
 		}
 		
 		
-		return 0;
+		return false;
 	}
 	
-	static public double interpolateHeight(Vector3d pA, Vector3d pB, Vector3d pC, double x, double z) {
+	static public double interpolateBarycentric(Vector3d pA, Vector3d pB, Vector3d pC, double x, double z) {
 	    // Plane equation ax+by+cz+d=0
 	    double a = (pB.y - pA.y) * (pC.z - pA.z) - (pC.y - pA.y) * (pB.z - pA.z);
 	    double b = (pB.z - pA.z) * (pC.x - pA.x) - (pC.z - pA.z) * (pB.x - pA.x);
@@ -747,6 +777,14 @@ int test = 0;
 	    // y = (-d -ax -cz) / b
 	    double y = (-d - a * x - c * z) / b;
 	    return y;
+	}
+	
+	static public double interpolateLinear(Vector3d point1, Vector3d point2, Vector2d aPoint) {
+		double distanceBetweenPoint1AndPoint2 = Math.sqrt((point1.x - point2.x)*(point1.x - point2.x) + (point1.y - point2.y)*(point1.y - point2.y));
+		double distanceBetweenPoint1AndAPoint = Math.sqrt((point1.x - aPoint.x)*(point1.x - aPoint.x) + (point1.y - aPoint.y)*(point1.y - aPoint.y));
+		double amount = distanceBetweenPoint1AndAPoint/distanceBetweenPoint1AndPoint2; 
+		double value = point1.z*(1 - amount) + point2.z*amount;
+		return value;
 	}
 
 }
