@@ -3,6 +3,7 @@ public class IntervalObject {
 	private int a = 2;
 	private double x1,x2, y1,y2, z1,z2;
 	private boolean leftCliff,rightCliff;
+	private String leftNeighborIndex, rightNeighborIndex;
 	private int type;
 	
 	public IntervalObject(double x1, double x2, double y1, double y2, double z1, double z2, boolean leftCliff, boolean rightCliff, int type) {
@@ -16,10 +17,14 @@ public class IntervalObject {
 		this.setZ1(z1);
 		this.setZ2(z2);
 
+		this.leftNeighborIndex = "-1";
+		this.rightNeighborIndex = "-1";
+		
 		this.type = type;
 		
 		this.leftCliff = leftCliff;
 		this.rightCliff = rightCliff;
+		
 		
 		
 	}
@@ -86,6 +91,22 @@ public class IntervalObject {
 
 	public void setRightCliff(boolean rightCliff) {
 		this.rightCliff = rightCliff;
+	}
+
+	public String getRightNeighborIndex() {
+		return rightNeighborIndex;
+	}
+
+	public void setRightNeighborIndex(String rightNeighborIndex) {
+		this.rightNeighborIndex = rightNeighborIndex;
+	}
+
+	public String getLeftNeighborIndex() {
+		return leftNeighborIndex;
+	}
+
+	public void setLeftNeighborIndex(String leftNeighborIndex) {
+		this.leftNeighborIndex = leftNeighborIndex;
 	}
 	
 	

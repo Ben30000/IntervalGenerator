@@ -24,6 +24,7 @@ public class IntervalGenerator {
 	// Output: a file containing intervals and/or ceilings/sloped walls	
 
 	static double landingPrecision = 0.0000000000001;
+	static double equalEndpointPrecision = 0.0000000000001;
 	private static double tX,tY,tZ, size, rotationX, rotationY, rotationZ;
 
 int test = 0;
@@ -446,55 +447,54 @@ int test = 0;
             	
             	ArrayList<Vector3d> intersectionPoints = new ArrayList<Vector3d>();
             	
-            	System.out.println("                        ~~New Polygon~~");
             	
-            	System.out.println("Edge 1: "+(new Vector2d(v1X,v1Z))+",  "+(new Vector2d(v2X,v2Z)));
-            	double[] edge1IntersectionResult = lineIntersection(v1X,v1Z,v2X,v2Z,-1000000.0,targetZValue,1000000.0,targetZValue); 
-            	if (edge1IntersectionResult != null) {
+
+            	double[] edge1XZIntersectionResult = lineIntersection(v1X,v1Z,v2X,v2Z,-1000000.0,targetZValue,1000000.0,targetZValue); 
+            	if (edge1XZIntersectionResult != null) {
             		// Create the 3d point by interpolating the y value
-            		Vector3d intersectionPoint = new Vector3d( edge1IntersectionResult[0],
-            				interpolateLinear(new Vector3d(v1X,v1Z,v1Y), new Vector3d(v2X,v2Z,v2Y), new Vector2d(edge1IntersectionResult[0],edge1IntersectionResult[1])),
-            				edge1IntersectionResult[1] );
-            		System.out.println(" Edge 1: Potential Intersection: "+intersectionPoint);
+            		Vector3d intersectionPoint = new Vector3d( edge1XZIntersectionResult[0],
+            				interpolateLinear(new Vector3d(v1X,v1Z,v1Y), new Vector3d(v2X,v2Z,v2Y), new Vector2d(edge1XZIntersectionResult[0],edge1XZIntersectionResult[1])),
+            				edge1XZIntersectionResult[1] );
+
             		if (!isVector3dWithinArrayList(intersectionPoint,intersectionPoints)) {
-            			System.out.println("   GONNA ADD IT");
+
             			intersectionPoints.add(intersectionPoint);
             		} 
             		
             	}
             	
-            	System.out.println("Edge 2: "+(new Vector2d(v1X,v1Z))+",  "+(new Vector2d(v3X,v3Z)));
-            	double[] edge2IntersectionResult = lineIntersection(v1X,v1Z,v3X,v3Z,-1000000.0,targetZValue,1000000.0,targetZValue);
-            	if (edge2IntersectionResult != null) {
+
+            	double[] edge2XZIntersectionResult = lineIntersection(v1X,v1Z,v3X,v3Z,-1000000.0,targetZValue,1000000.0,targetZValue);
+            	if (edge2XZIntersectionResult != null) {
             		
-            		Vector3d intersectionPoint = new Vector3d( edge2IntersectionResult[0],
-            				interpolateLinear(new Vector3d(v1X,v1Z,v1Y), new Vector3d(v3X,v3Z,v3Y), new Vector2d(edge2IntersectionResult[0],edge2IntersectionResult[1])),
-            				edge2IntersectionResult[1] );
-            		System.out.println(" Edge 2: Potential Intersection: "+intersectionPoint);
+            		Vector3d intersectionPoint = new Vector3d( edge2XZIntersectionResult[0],
+            				interpolateLinear(new Vector3d(v1X,v1Z,v1Y), new Vector3d(v3X,v3Z,v3Y), new Vector2d(edge2XZIntersectionResult[0],edge2XZIntersectionResult[1])),
+            				edge2XZIntersectionResult[1] );
+
             		if (!isVector3dWithinArrayList(intersectionPoint,intersectionPoints)) {
-            			System.out.println("   GONNA ADD IT");
+
             			intersectionPoints.add(intersectionPoint);
             		} 
             		
             	}
             	
-            	System.out.println("Edge 3: "+(new Vector2d(v2X,v2Z))+",  "+(new Vector2d(v3X,v3Z)));
-            	double[] edge3IntersectionResult = lineIntersection(v2X,v2Z,v3X,v3Z,-1000000.0,targetZValue,1000000.0,targetZValue);
-            	if (edge3IntersectionResult != null) {
+
+            	double[] edge3XZIntersectionResult = lineIntersection(v2X,v2Z,v3X,v3Z,-1000000.0,targetZValue,1000000.0,targetZValue);
+            	if (edge3XZIntersectionResult != null) {
             		
-            		Vector3d intersectionPoint = new Vector3d( edge3IntersectionResult[0],
-            				interpolateLinear(new Vector3d(v2X,v2Z,v2Y), new Vector3d(v3X,v3Z,v3Y), new Vector2d(edge3IntersectionResult[0],edge3IntersectionResult[1])),
-            				edge3IntersectionResult[1] );
-            		System.out.println(" Edge 3: Potential Intersection: "+intersectionPoint);
+            		Vector3d intersectionPoint = new Vector3d( edge3XZIntersectionResult[0],
+            				interpolateLinear(new Vector3d(v2X,v2Z,v2Y), new Vector3d(v3X,v3Z,v3Y), new Vector2d(edge3XZIntersectionResult[0],edge3XZIntersectionResult[1])),
+            				edge3XZIntersectionResult[1] );
+
         			if (!isVector3dWithinArrayList(intersectionPoint,intersectionPoints)) {
-        				System.out.println("   GONNA ADD IT");
+
             			intersectionPoints.add(intersectionPoint);
             		} 
 	
             	}
             	
             	if (intersectionPoints.size() == 1) {
-            		System.out.println("Intersection Line Count: 1");
+
             	}
             	if (intersectionPoints.size() == 3) {
             		System.out.println("Error");
@@ -503,7 +503,7 @@ int test = 0;
             	//System.out.println("Size of intersectedX is " + intersectedX.size());
             	if (intersectionPoints.size() == 2) {
             		intervalCount++;
-            		System.out.println("!!!!!!!!!!!!!!!!!! Generating an Interval !!!!!!!!!!!!!!!!!!!!!!!!!!");
+            	//	System.out.println("!!!!!!!!!!!!!!!!!! Generating an Interval !!!!!!!!!!!!!!!!!!!!!!!!!!");
 
             		if ( intersectionPoints.get(1).x >= intersectionPoints.get(0).x ) {
             			x1 = intersectionPoints.get(0).x;
@@ -569,8 +569,11 @@ int test = 0;
             	// Angle between up and planar normal
             	double planarNormalAngle = planarNormal.angle(upVector);
             	
-            	
-            	// FOR HANDLING PERPENDICULAR WALLS
+            	/*
+            	 * 
+            	 FOR PERPENDICULAR WALLS: SETTING x1,y1 AND x2,y2 TO HAVE THE RIGHT ORDER 
+            	 * 
+            	 */
             	if (x1 == x2 && planarNormal.x < 0.0) {
             		if (y2 < y1) {
             			double x2Temp, y2Temp;
@@ -593,7 +596,10 @@ int test = 0;
             			y1 = y2Temp;
             		}
             	}
-            	
+            	/*
+            	 * 
+            	 * 
+            	 */
             	
             	
             	
@@ -639,9 +645,151 @@ int test = 0;
             
     System.out.println("AFTER FOR LOOP");        
             
+            /*
+             * NOW, SET THE NEIGHBOR FOR EACH INTERVAL USING INDICES
+             * EACH INTERVAL HAS AN INDEX, STARTING AT 0
+             * EACH SECTION (TERRAIN, WALL, CEILING) HAS IT'S OWN INDEX SET
+             */
             
+    		// FIND NEIGHBORS FOR TERRAIN
+    		for (int b = 0; b < terrains.size(); b++) {
+    			
+    			IntervalObject thisTerrain = terrains.get(b);
+    			double thisTerrainX1 = thisTerrain.getX1(), thisTerrainX2 = thisTerrain.getX2();
+    			double thisTerrainY1 = thisTerrain.getY1(), thisTerrainY2 = thisTerrain.getY2();
+    			
+    			for (int n = 0; n < terrains.size(); n++) {
+    				if (Math.abs(thisTerrainX1 - terrains.get(n).getX2()) <= equalEndpointPrecision
+    						&& Math.abs(thisTerrainY1 - terrains.get(n).getY2()) <= equalEndpointPrecision) {
+    					thisTerrain.setLeftNeighborIndex("t"+n);
+    				}
+    				if (Math.abs(thisTerrainX2 - terrains.get(n).getX1()) <= equalEndpointPrecision
+    						&& Math.abs(thisTerrainY2 - terrains.get(n).getY1()) <= equalEndpointPrecision) {
+    					thisTerrain.setRightNeighborIndex("t"+n);
+    				}
+    			}
+    			
+    			for (int n = 0; n < walls.size(); n++) {
+    				if (Math.abs(thisTerrainX1 - walls.get(n).getX2()) <= equalEndpointPrecision
+    						&& Math.abs(thisTerrainY1 - walls.get(n).getY2()) <= equalEndpointPrecision) {
+    					thisTerrain.setLeftNeighborIndex("w"+n);
+    				}
+    				if (Math.abs(thisTerrainX2 - walls.get(n).getX1()) <= equalEndpointPrecision
+    						&& Math.abs(thisTerrainY2 - walls.get(n).getY1()) <= equalEndpointPrecision) {
+    					thisTerrain.setRightNeighborIndex("w"+n);
+    				}
+    			}
+    			
+    			for (int n = 0; n < ceilings.size(); n++) {
+    				if (Math.abs(thisTerrainX1 - ceilings.get(n).getX2()) <= equalEndpointPrecision
+    						&& Math.abs(thisTerrainY1 - ceilings.get(n).getY2()) <= equalEndpointPrecision) {
+    					thisTerrain.setLeftNeighborIndex("c"+n);
+    				}
+    				if (Math.abs(thisTerrainX2 - ceilings.get(n).getX1()) <= equalEndpointPrecision
+    						&& Math.abs(thisTerrainY2 - ceilings.get(n).getY1()) <= equalEndpointPrecision) {
+    					thisTerrain.setRightNeighborIndex("c"+n);
+    				}
+    			}
+    			
+    		}
+    
+    		// FIND NEIGHBORS FOR WALLS
+    		for (int b = 0; b < walls.size(); b++) {
+    			
+    			IntervalObject thisWall = walls.get(b);
+    			double thisWallX1 = thisWall.getX1(), thisWallX2 = thisWall.getX2();
+    			double thisWallY1 = thisWall.getY1(), thisWallY2 = thisWall.getY2();
+    			
+    			for (int n = 0; n < terrains.size(); n++) {
+    				if (Math.abs(thisWallX1 - terrains.get(n).getX2()) <= equalEndpointPrecision
+    						&& Math.abs(thisWallY1 - terrains.get(n).getY2()) <= equalEndpointPrecision) {
+    					thisWall.setLeftNeighborIndex("t"+n);
+    				}
+    				if (Math.abs(thisWallX2 - terrains.get(n).getX1()) <= equalEndpointPrecision
+    						&& Math.abs(thisWallY2 - terrains.get(n).getY1()) <= equalEndpointPrecision) {
+    					thisWall.setRightNeighborIndex("t"+n);
+    				}
+    			}
+    			
+    			for (int n = 0; n < walls.size(); n++) {
+    				if (Math.abs(thisWallX1 - walls.get(n).getX2()) <= equalEndpointPrecision
+    						&& Math.abs(thisWallY1 - walls.get(n).getY2()) <= equalEndpointPrecision) {
+    					thisWall.setLeftNeighborIndex("w"+n);
+    				}
+    				if (Math.abs(thisWallX2 - walls.get(n).getX1()) <= equalEndpointPrecision
+    						&& Math.abs(thisWallY2 - walls.get(n).getY1()) <= equalEndpointPrecision) {
+    					thisWall.setRightNeighborIndex("w"+n);
+    				}
+    			}
+    			
+    			for (int n = 0; n < ceilings.size(); n++) {
+    				if (Math.abs(thisWallX1 - ceilings.get(n).getX2()) <= equalEndpointPrecision
+    						&& Math.abs(thisWallY1 - ceilings.get(n).getY2()) <= equalEndpointPrecision) {
+    					thisWall.setLeftNeighborIndex("c"+n);
+    				}
+    				if (Math.abs(thisWallX2 - ceilings.get(n).getX1()) <= equalEndpointPrecision
+    						&& Math.abs(thisWallY2 - ceilings.get(n).getY1()) <= equalEndpointPrecision) {
+    					thisWall.setRightNeighborIndex("c"+n);
+    				}
+    			}
+    			
+    		}
+
+
+    		// FIND NEIGHBORS FOR CEILINGS
+			for (int b = 0; b < ceilings.size(); b++) {
+				
+				IntervalObject thisCeiling = ceilings.get(b);
+				double thisCeilingX1 = thisCeiling.getX1(), thisCeilingX2 = thisCeiling.getX2();
+				double thisCeilingY1 = thisCeiling.getY1(), thisCeilingY2 = thisCeiling.getY2();
+				
+				for (int n = 0; n < terrains.size(); n++) {
+					if (Math.abs(thisCeilingX1 - terrains.get(n).getX2()) <= equalEndpointPrecision
+							&& Math.abs(thisCeilingY1 - terrains.get(n).getY2()) <= equalEndpointPrecision) {
+						thisCeiling.setLeftNeighborIndex("t"+n);
+					}
+					if (Math.abs(thisCeilingX2 - terrains.get(n).getX1()) <= equalEndpointPrecision
+							&& Math.abs(thisCeilingY2 - terrains.get(n).getY1()) <= equalEndpointPrecision) {
+						thisCeiling.setRightNeighborIndex("t"+n);
+					}
+				}
+				
+				for (int n = 0; n < walls.size(); n++) {
+					if (Math.abs(thisCeilingX1 - walls.get(n).getX2()) <= equalEndpointPrecision
+							&& Math.abs(thisCeilingY1 - walls.get(n).getY2()) <= equalEndpointPrecision) {
+						thisCeiling.setLeftNeighborIndex("w"+n);
+					}
+					if (Math.abs(thisCeilingX2 - walls.get(n).getX1()) <= equalEndpointPrecision
+							&& Math.abs(thisCeilingY2 - walls.get(n).getY1()) <= equalEndpointPrecision) {
+						thisCeiling.setRightNeighborIndex("w"+n);
+					}
+				}
+				
+				for (int n = 0; n < ceilings.size(); n++) {
+					if (Math.abs(thisCeilingX1 - ceilings.get(n).getX2()) <= equalEndpointPrecision
+							&& Math.abs(thisCeilingY1 - ceilings.get(n).getY2()) <= equalEndpointPrecision) {
+						thisCeiling.setLeftNeighborIndex("c"+n);
+					}
+					if (Math.abs(thisCeilingX2 - ceilings.get(n).getX1()) <= equalEndpointPrecision
+							&& Math.abs(thisCeilingY2 - ceilings.get(n).getY1()) <= equalEndpointPrecision) {
+						thisCeiling.setRightNeighborIndex("c"+n);
+					}
+				}
+				
+			}
+    
+    
+			
+			
+			// TESTING: Print out neighbor indices of intervals
+			/*for (int y = 0; y < terrains.size(); y++) {
+				System.out.println("This terrain has x1 = "+terrains.get(y).getX1()+", x2 = "+terrains.get(y).getX2()+" and y1 = "+terrains.get(y).getY1()+", y2 = "+terrains.get(y).getY2());
+				System.out.println("It has left neighbor with index = "+terrains.get(y).getLeftNeighborIndex()+" and right neighbor with index = "+terrains.get(y).getRightNeighborIndex());
+			}*/
             
-            
+			
+			
+			
             /*
              * * * * * * * * * * * * *
              *  WRITE OUT THE DATA * *
@@ -657,12 +805,17 @@ int test = 0;
             outFile.createNewFile();
             BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
             
+            writer.write("FORMAT: x1 x2 y1 y2 z1 z2 leftIntervalIndex rightIntervalIndex");
+            writer.write(System.lineSeparator());
+            writer.write("t == terrain, w == wall, c == ceiling");
+            writer.write(System.lineSeparator());
+            
             if (terrains.size() != 0) {
 	            writer.write("TERRAIN");
 	            writer.write(System.lineSeparator());
 	            for (int s = 0; s < terrains.size(); s++) {
 	            	
-	            	writer.write(Double.toString(terrains.get(s).getX1()) + " " + Double.toString(terrains.get(s).getX2()) + " " + Double.toString(terrains.get(s).getY1()) + " " + Double.toString(terrains.get(s).getY2()) + " " + Double.toString(terrains.get(s).getZ1()) + " " + Double.toString(terrains.get(s).getZ2()) + " " + "false" + " " + "false" );
+	            	writer.write(Double.toString(terrains.get(s).getX1()) + " " + Double.toString(terrains.get(s).getX2()) + " " + Double.toString(terrains.get(s).getY1()) + " " + Double.toString(terrains.get(s).getY2()) + " " + Double.toString(terrains.get(s).getZ1()) + " " + Double.toString(terrains.get(s).getZ2()) + " " + terrains.get(s).getLeftNeighborIndex() + " " + terrains.get(s).getRightNeighborIndex() );
 	            	
 	            	if ((s != terrains.size() - 1) || (s == terrains.size() - 1 && walls.size() != 0) || (s == terrains.size() - 1 && ceilings.size() != 0)) {
 	            		writer.write(System.lineSeparator());
@@ -676,7 +829,7 @@ int test = 0;
 	            writer.write(System.lineSeparator());
 	            for (int s = 0; s < walls.size(); s++) {
 	            	
-	            	writer.write(Double.toString(walls.get(s).getX1()) + " " + Double.toString(walls.get(s).getX2()) + " " + Double.toString(walls.get(s).getY1()) + " " + Double.toString(walls.get(s).getY2()) + " " + Double.toString(walls.get(s).getZ1()) + " " + Double.toString(walls.get(s).getZ2()) + " " + "false" + " " + "false" );
+	            	writer.write(Double.toString(walls.get(s).getX1()) + " " + Double.toString(walls.get(s).getX2()) + " " + Double.toString(walls.get(s).getY1()) + " " + Double.toString(walls.get(s).getY2()) + " " + Double.toString(walls.get(s).getZ1()) + " " + Double.toString(walls.get(s).getZ2()) + " " + walls.get(s).getLeftNeighborIndex() + " " + walls.get(s).getRightNeighborIndex() );
 
 	            	if ((s != walls.size() - 1) || (s == walls.size() - 1 && ceilings.size() != 0)) {
 	            		writer.write(System.lineSeparator());
@@ -690,7 +843,7 @@ int test = 0;
 	            writer.write(System.lineSeparator());
 	            for (int s = 0; s < ceilings.size(); s++) {
 	            	
-	            	writer.write(Double.toString(ceilings.get(s).getX1()) + " " + Double.toString(ceilings.get(s).getX2()) + " " + Double.toString(ceilings.get(s).getY1()) + " " + Double.toString(ceilings.get(s).getY2()) + " " + Double.toString(ceilings.get(s).getZ1()) + " " + Double.toString(ceilings.get(s).getZ2()) + " " + "false" + " " + "false" );
+	            	writer.write(Double.toString(ceilings.get(s).getX1()) + " " + Double.toString(ceilings.get(s).getX2()) + " " + Double.toString(ceilings.get(s).getY1()) + " " + Double.toString(ceilings.get(s).getY2()) + " " + Double.toString(ceilings.get(s).getZ1()) + " " + Double.toString(ceilings.get(s).getZ2()) + " " + ceilings.get(s).getLeftNeighborIndex() + " " + ceilings.get(s).getRightNeighborIndex() );
 	            	
 	            	if (s != ceilings.size() - 1) {
 	            		writer.write(System.lineSeparator());
