@@ -663,10 +663,11 @@ int test = 0;
     						&& Math.abs(thisTerrainY1 - terrains.get(n).getY2()) <= equalEndpointPrecision) {
     					thisTerrain.setLeftNeighborIndex("t"+n);
     				}
-    				if (Math.abs(thisTerrainX2 - terrains.get(n).getX1()) <= equalEndpointPrecision
+    				else if (Math.abs(thisTerrainX2 - terrains.get(n).getX1()) <= equalEndpointPrecision
     						&& Math.abs(thisTerrainY2 - terrains.get(n).getY1()) <= equalEndpointPrecision) {
     					thisTerrain.setRightNeighborIndex("t"+n);
     				}
+    				
     			}
     			
     			for (int n = 0; n < walls.size(); n++) {
@@ -674,9 +675,17 @@ int test = 0;
     						&& Math.abs(thisTerrainY1 - walls.get(n).getY2()) <= equalEndpointPrecision) {
     					thisTerrain.setLeftNeighborIndex("w"+n);
     				}
-    				if (Math.abs(thisTerrainX2 - walls.get(n).getX1()) <= equalEndpointPrecision
+    				else if (Math.abs(thisTerrainX2 - walls.get(n).getX1()) <= equalEndpointPrecision
     						&& Math.abs(thisTerrainY2 - walls.get(n).getY1()) <= equalEndpointPrecision) {
     					thisTerrain.setRightNeighborIndex("w"+n);
+    				}
+    				else if (Math.abs(thisTerrainX2 - walls.get(n).getX2()) <= equalEndpointPrecision
+    						&& Math.abs(thisTerrainY2 - walls.get(n).getY2()) <= equalEndpointPrecision) {
+    					thisTerrain.setRightNeighborIndex("w"+n);
+    				}
+    				else if (Math.abs(thisTerrainX1 - walls.get(n).getX1()) <= equalEndpointPrecision
+    						&& Math.abs(thisTerrainY1 - walls.get(n).getY1()) <= equalEndpointPrecision) {
+    					thisTerrain.setLeftNeighborIndex("w"+n);
     				}
     			}
     			
@@ -685,9 +694,17 @@ int test = 0;
     						&& Math.abs(thisTerrainY1 - ceilings.get(n).getY2()) <= equalEndpointPrecision) {
     					thisTerrain.setLeftNeighborIndex("c"+n);
     				}
-    				if (Math.abs(thisTerrainX2 - ceilings.get(n).getX1()) <= equalEndpointPrecision
+    				else if (Math.abs(thisTerrainX2 - ceilings.get(n).getX1()) <= equalEndpointPrecision
     						&& Math.abs(thisTerrainY2 - ceilings.get(n).getY1()) <= equalEndpointPrecision) {
     					thisTerrain.setRightNeighborIndex("c"+n);
+    				}
+    				else if (Math.abs(thisTerrainX2 - ceilings.get(n).getX2()) <= equalEndpointPrecision
+    						&& Math.abs(thisTerrainY2 - ceilings.get(n).getY2()) <= equalEndpointPrecision) {
+    					thisTerrain.setRightNeighborIndex("c"+n);
+    				}
+    				else if (Math.abs(thisTerrainX1 - ceilings.get(n).getX1()) <= equalEndpointPrecision
+    						&& Math.abs(thisTerrainY1 - ceilings.get(n).getY1()) <= equalEndpointPrecision) {
+    					thisTerrain.setLeftNeighborIndex("c"+n);
     				}
     			}
     			
@@ -705,19 +722,43 @@ int test = 0;
     						&& Math.abs(thisWallY1 - terrains.get(n).getY2()) <= equalEndpointPrecision) {
     					thisWall.setLeftNeighborIndex("t"+n);
     				}
-    				if (Math.abs(thisWallX2 - terrains.get(n).getX1()) <= equalEndpointPrecision
+    				else if (Math.abs(thisWallX2 - terrains.get(n).getX1()) <= equalEndpointPrecision
     						&& Math.abs(thisWallY2 - terrains.get(n).getY1()) <= equalEndpointPrecision) {
     					thisWall.setRightNeighborIndex("t"+n);
+    				}
+    				else if (Math.abs(thisWallX2 - terrains.get(n).getX2()) <= equalEndpointPrecision
+    						&& Math.abs(thisWallY2 - terrains.get(n).getY2()) <= equalEndpointPrecision) {
+    					thisWall.setRightNeighborIndex("t"+n);
+    				}
+    				else if (Math.abs(thisWallX1 - terrains.get(n).getX1()) <= equalEndpointPrecision
+    						&& Math.abs(thisWallY1 - terrains.get(n).getY1()) <= equalEndpointPrecision) {
+    					thisWall.setLeftNeighborIndex("t"+n);
     				}
     			}
     			
     			for (int n = 0; n < walls.size(); n++) {
     				if (Math.abs(thisWallX1 - walls.get(n).getX2()) <= equalEndpointPrecision
     						&& Math.abs(thisWallY1 - walls.get(n).getY2()) <= equalEndpointPrecision) {
+    					//System.out.println("wall with x1 = "+thisWallX1+" shared with wall x2 ");
     					thisWall.setLeftNeighborIndex("w"+n);
     				}
-    				if (Math.abs(thisWallX2 - walls.get(n).getX1()) <= equalEndpointPrecision
+    				else if (Math.abs(thisWallX2 - walls.get(n).getX1()) <= equalEndpointPrecision
     						&& Math.abs(thisWallY2 - walls.get(n).getY1()) <= equalEndpointPrecision) {
+    					//System.out.println("wall with x2 = "+thisWallX2+" shared with wall x1 ");
+    					thisWall.setRightNeighborIndex("w"+n);
+    				}
+    				else if (Math.abs(thisWallX1 - walls.get(n).getX1()) <= equalEndpointPrecision
+    						&& Math.abs(thisWallY1 - walls.get(n).getY1()) <= equalEndpointPrecision
+    						&& thisWallX1 != walls.get(n).getX1() 
+    						&& thisWallY1 != walls.get(n).getY1()) {
+    					//System.out.println("wall with x1 = "+thisWallX1+" shared with wall x1 ");
+    					thisWall.setLeftNeighborIndex("w"+n);
+    				}
+    				else if (Math.abs(thisWallX2 - walls.get(n).getX2()) <= equalEndpointPrecision
+    						&& Math.abs(thisWallY2 - walls.get(n).getY2()) <= equalEndpointPrecision
+    						&& thisWallX2 != walls.get(n).getX2() 
+    						&& thisWallY2 != walls.get(n).getY2()) {
+    					//System.out.println("wall with x2 = "+thisWallX2+" shared with wall x2 ");
     					thisWall.setRightNeighborIndex("w"+n);
     				}
     			}
@@ -725,10 +766,21 @@ int test = 0;
     			for (int n = 0; n < ceilings.size(); n++) {
     				if (Math.abs(thisWallX1 - ceilings.get(n).getX2()) <= equalEndpointPrecision
     						&& Math.abs(thisWallY1 - ceilings.get(n).getY2()) <= equalEndpointPrecision) {
+    					//System.out.println("Found ceiling neighbor for wall");
     					thisWall.setLeftNeighborIndex("c"+n);
     				}
     				if (Math.abs(thisWallX2 - ceilings.get(n).getX1()) <= equalEndpointPrecision
     						&& Math.abs(thisWallY2 - ceilings.get(n).getY1()) <= equalEndpointPrecision) {
+    				//	System.out.println("Found ceiling neighbor for wall");
+    					thisWall.setRightNeighborIndex("c"+n);
+    				}
+    				if (Math.abs(thisWallX1 - ceilings.get(n).getX1()) <= equalEndpointPrecision
+    						&& Math.abs(thisWallY1 - ceilings.get(n).getY1()) <= equalEndpointPrecision) {
+    					thisWall.setLeftNeighborIndex("c"+n);
+    				}
+    				if (Math.abs(thisWallX2 - ceilings.get(n).getX2()) <= equalEndpointPrecision
+    						&& Math.abs(thisWallY2 - ceilings.get(n).getY2()) <= equalEndpointPrecision) {
+    					//System.out.println("Found ceiling neighbor for wall");
     					thisWall.setRightNeighborIndex("c"+n);
     				}
     			}
@@ -748,9 +800,17 @@ int test = 0;
 							&& Math.abs(thisCeilingY1 - terrains.get(n).getY2()) <= equalEndpointPrecision) {
 						thisCeiling.setLeftNeighborIndex("t"+n);
 					}
-					if (Math.abs(thisCeilingX2 - terrains.get(n).getX1()) <= equalEndpointPrecision
+					else if (Math.abs(thisCeilingX2 - terrains.get(n).getX1()) <= equalEndpointPrecision
 							&& Math.abs(thisCeilingY2 - terrains.get(n).getY1()) <= equalEndpointPrecision) {
 						thisCeiling.setRightNeighborIndex("t"+n);
+					}
+					else if (Math.abs(thisCeilingX2 - terrains.get(n).getX2()) <= equalEndpointPrecision
+							&& Math.abs(thisCeilingY2 - terrains.get(n).getY2()) <= equalEndpointPrecision) {
+						thisCeiling.setRightNeighborIndex("t"+n);
+					}
+					else if (Math.abs(thisCeilingX1 - terrains.get(n).getX1()) <= equalEndpointPrecision
+							&& Math.abs(thisCeilingY1 - terrains.get(n).getY1()) <= equalEndpointPrecision) {
+						thisCeiling.setLeftNeighborIndex("t"+n);
 					}
 				}
 				
@@ -759,9 +819,17 @@ int test = 0;
 							&& Math.abs(thisCeilingY1 - walls.get(n).getY2()) <= equalEndpointPrecision) {
 						thisCeiling.setLeftNeighborIndex("w"+n);
 					}
-					if (Math.abs(thisCeilingX2 - walls.get(n).getX1()) <= equalEndpointPrecision
+					else if (Math.abs(thisCeilingX2 - walls.get(n).getX1()) <= equalEndpointPrecision
 							&& Math.abs(thisCeilingY2 - walls.get(n).getY1()) <= equalEndpointPrecision) {
 						thisCeiling.setRightNeighborIndex("w"+n);
+					}
+					else if (Math.abs(thisCeilingX2 - walls.get(n).getX2()) <= equalEndpointPrecision
+							&& Math.abs(thisCeilingY2 - walls.get(n).getY2()) <= equalEndpointPrecision) {
+						thisCeiling.setRightNeighborIndex("w"+n);
+					}
+					else if (Math.abs(thisCeilingX1 - walls.get(n).getX1()) <= equalEndpointPrecision
+							&& Math.abs(thisCeilingY1 - walls.get(n).getY1()) <= equalEndpointPrecision) {
+						thisCeiling.setLeftNeighborIndex("w"+n);
 					}
 				}
 				
@@ -770,9 +838,21 @@ int test = 0;
 							&& Math.abs(thisCeilingY1 - ceilings.get(n).getY2()) <= equalEndpointPrecision) {
 						thisCeiling.setLeftNeighborIndex("c"+n);
 					}
-					if (Math.abs(thisCeilingX2 - ceilings.get(n).getX1()) <= equalEndpointPrecision
+					else if (Math.abs(thisCeilingX2 - ceilings.get(n).getX1()) <= equalEndpointPrecision
 							&& Math.abs(thisCeilingY2 - ceilings.get(n).getY1()) <= equalEndpointPrecision) {
 						thisCeiling.setRightNeighborIndex("c"+n);
+					}
+					else if (Math.abs(thisCeilingX2 - ceilings.get(n).getX2()) <= equalEndpointPrecision
+							&& Math.abs(thisCeilingY2 - ceilings.get(n).getY2()) <= equalEndpointPrecision
+							&& thisCeilingX2 != ceilings.get(n).getX2()
+							&& thisCeilingY2 != ceilings.get(n).getY2()) {
+						thisCeiling.setRightNeighborIndex("c"+n);
+					}
+					else if (Math.abs(thisCeilingX1 - ceilings.get(n).getX1()) <= equalEndpointPrecision
+							&& Math.abs(thisCeilingY1 - ceilings.get(n).getY1()) <= equalEndpointPrecision
+							&& thisCeilingX1 != ceilings.get(n).getX1()
+							&& thisCeilingY1 != ceilings.get(n).getY1()) {
+						thisCeiling.setLeftNeighborIndex("c"+n);
 					}
 				}
 				
